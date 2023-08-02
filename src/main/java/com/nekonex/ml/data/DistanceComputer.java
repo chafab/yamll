@@ -19,7 +19,7 @@ public class DistanceComputer {
         double result = 0;
         for (int i = 0; i < p1.getNumAxis(); ++i) {
             Object ax1 = p1.getCoordinate(i);
-            Object ax2 = p1.getCoordinate(i);
+            Object ax2 = p2.getCoordinate(i);
             if (ax1.getClass() != ax2.getClass())
                 throw new DataPointsIncompatibleException();
             if (ax1.getClass() != Double.class) //Very limited type support

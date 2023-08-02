@@ -1,15 +1,21 @@
 package com.nekonex.ml.cluster.kdtree;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.nekonex.ml.cluster.IClusterNode;
+import com.nekonex.ml.data.IDataPoint;
 
 import java.util.List;
 
+@JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class)
 public class KdNode {
     public final IClusterNode point;
 
     public final int depth;
     public final int axisIndex;
 
+    @JsonBackReference
     private KdNode parentNode;
     private KdNode leftNode;
     private KdNode rightNode;
@@ -62,5 +68,9 @@ public class KdNode {
 
     public int numberOfChildren() {
         return (leftNode != null ? 1 : 0) + (rightNode != null ? 1 : 0);
+    }
+
+    public IDataPoint getClusterPoint() {
+        return point.getPoint();
     }
 }

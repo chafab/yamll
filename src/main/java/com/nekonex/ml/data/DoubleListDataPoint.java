@@ -7,7 +7,7 @@ import java.util.List;
 public class DoubleListDataPoint  implements IDataPoint {
     List<Double> _data;
 
-    DoubleListDataPoint(List<Double> data) {
+    public DoubleListDataPoint(List<Double> data) {
         this._data = data;
     }
     @Override
@@ -34,7 +34,7 @@ public class DoubleListDataPoint  implements IDataPoint {
     }
 
     @Override
-    public IDataPoint cloneDataPoint() {
+    public IDataPoint clone() {
         return new DoubleListDataPoint(_data.stream().toList());
     }
 }

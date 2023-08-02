@@ -10,14 +10,14 @@ public class OnlineKMeanNode implements IClusterNode{
 
     private double _coefficient = 0.1;
     private long _count = 0;
-    public OnlineKMeanNode(OnlineKmeanConfig config) throws Exception {
+    public OnlineKMeanNode(OnlineKmeanConfig config) {
         _config = config;
         _coefficient = _config.getInitialCoefficient();
     }
     @Override
     public synchronized void addDataPoint(IDataPoint data_point) {
         if (_coordinates == null) {
-            _coordinates = data_point.cloneDataPoint();
+            _coordinates = data_point.clone();
         }
         else
         {
@@ -40,6 +40,15 @@ public class OnlineKMeanNode implements IClusterNode{
         return _coordinates;
     }
 
+    @Override
+    public IClusterNode clone() {
+        OnlineKMeanNode clone = new OnlineKMeanNode(_config);
+        clone.setCoordinates(this._coordinates.clone());
+        clone.setCoefficient(_coefficient);
+        clone.setCount(_count);
+        return clone;
+    }
+
     public synchronized void setCoordinates(IDataPoint value) {
         _coordinates = value;
     }
@@ -51,4 +60,6 @@ public class OnlineKMeanNode implements IClusterNode{
     public synchronized void setCoefficient(double value) {
         _coefficient = value;
     }
+
+    public synchronized  void setCount(long value) { _count = value;}
 }

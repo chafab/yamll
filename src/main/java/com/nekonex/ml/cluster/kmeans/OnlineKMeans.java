@@ -1,7 +1,7 @@
 package com.nekonex.ml.cluster.kmeans;
 
 import com.nekonex.ml.cluster.IClusterAlgorithm;
-import com.nekonex.ml.cluster.IClusterNode;
+import com.nekonex.ml.cluster.kdtree.KdTree;
 import com.nekonex.ml.data.DistanceComputer;
 import com.nekonex.ml.data.IDataPoint;
 
@@ -10,15 +10,17 @@ import java.util.List;
 import java.util.Random;
 
 public class OnlineKMeans implements IClusterAlgorithm {
-    IOnlineKMeanNodeFactory _KMeanNodefactory = null;
     OnlineKmeanConfig _config;
+    List<OnlineKMeanNode> list = new ArrayList<>();
+    public OnlineKMeans(OnlineKmeanConfig config) {
+        _config = config;
+    }
     @Override
-    public void buildCuster(List<IDataPoint> dataPoints, int num_cluster) throws Exception {
-        List<OnlineKMeanNode> list = new ArrayList<>();
+    public KdTree buildCluster(List<IDataPoint> dataPoints) throws Exception {
         Random rand = new Random(0);
         while (dataPoints.size() > 0) {
-            if (num_cluster < list.size()) {
-                OnlineKMeanNode node = _KMeanNodefactory.create(_config);
+            if (_config.getNumCluster() < list.size()) {
+                OnlineKMeanNode node = new OnlineKMeanNode(_config);
                 list.add(node);
 
 
@@ -33,7 +35,7 @@ public class OnlineKMeans implements IClusterAlgorithm {
                 double min_distance = Double.MAX_VALUE;
                 for (OnlineKMeanNode node : list) {
                     double distance =
-                            DistanceComputer.computeDistance(node.getPoint(), dataPoints.get(rndDataPnt), DistanceComputer.DistanceType.Euclidean);
+                            DistanceComputer.computeDistance(node.getPoint(), dataPoints.get(rndDataPnt), _config.getDistanceType());
                     if (nearestNode == null || distance < min_distance) {
                         nearestNode = node;
                         min_distance = distance;
@@ -43,10 +45,8 @@ public class OnlineKMeans implements IClusterAlgorithm {
                 dataPoints.remove(rndDataPnt);
             }
         }
+        return new KdTree(list.stream().map(OnlineKMeanNode::clone).toList(), _config.getDistanceType());
     }
 
-    @Override
-    public synchronized IClusterNode getClusterNode(IDataPoint points) {
-        return null;
-    }
+
 }
