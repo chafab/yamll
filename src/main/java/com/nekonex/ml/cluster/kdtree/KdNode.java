@@ -1,16 +1,15 @@
 package com.nekonex.ml.cluster.kdtree;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.*;
 import com.nekonex.ml.cluster.IClusterNode;
 import com.nekonex.ml.data.IDataPoint;
 
 import java.util.List;
 
 @JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class)
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class KdNode {
-    public final IClusterNode point;
+    public final IClusterNode clusterNode;
 
     public final int depth;
     public final int axisIndex;
@@ -20,12 +19,28 @@ public class KdNode {
     private KdNode leftNode;
     private KdNode rightNode;
 
-    public KdNode(final IClusterNode point, final int depth, final int axisIndex) {
-        this.point = point;
+    @JsonCreator
+    public KdNode(@JsonProperty("clusterNode") final IClusterNode clusterNode,
+                  @JsonProperty("depth") final int depth,
+                  @JsonProperty("axisIndex") final int axisIndex,
+                  @JsonProperty("parentNode") final KdNode parentNode,
+                  @JsonProperty("leftNode") final KdNode leftNode,
+                  @JsonProperty("rightNode") final KdNode rightNode) {
+        this.clusterNode = clusterNode;
+        this.depth = depth;
+        this.axisIndex = axisIndex;
+        this.parentNode = parentNode;
+        this.leftNode = leftNode;
+        this.rightNode = rightNode;
+    }
+
+    public KdNode(final IClusterNode clusterNode, final int depth, final int axisIndex) {
+        this.clusterNode = clusterNode;
         this.depth = depth;
         this.axisIndex = axisIndex;
     }
 
+    @JsonProperty("parentNode")
     public KdNode getParentNode() {
         return parentNode;
     }
@@ -34,6 +49,7 @@ public class KdNode {
         this.parentNode = parentNode;
     }
 
+    @JsonProperty("leftNode")
     public KdNode getLeftNode() {
         return leftNode;
     }
@@ -42,6 +58,7 @@ public class KdNode {
         this.leftNode = leftNode;
     }
 
+    @JsonProperty("rightNode")
     public KdNode getRightNode() {
         return rightNode;
     }
@@ -70,7 +87,40 @@ public class KdNode {
         return (leftNode != null ? 1 : 0) + (rightNode != null ? 1 : 0);
     }
 
+    @JsonIgnore
     public IDataPoint getClusterPoint() {
-        return point.getPoint();
+        return clusterNode.getPoint();
+    }
+
+    @JsonProperty("depth")
+    public int getDepth() {
+        return depth;
+    }
+    @JsonProperty("clusterNode")
+    public IClusterNode getClusterNode() {
+        return clusterNode;
+    }
+
+    @JsonProperty("axisIndex")
+    public int getAxisIndex() {
+        return axisIndex;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+
+        if (!(obj instanceof KdNode)) {
+            return false;
+        }
+
+        KdNode node = (KdNode) obj;
+        return this.clusterNode.equals(node.getClusterNode()) &&
+                this.depth == node.getDepth() &&
+                this.axisIndex == node.getAxisIndex() &&
+                this.leftNode != null ? this.leftNode.equals(node.getLeftNode()) : node.getLeftNode() == null &&
+                this.rightNode != null ? this.rightNode.equals(node.getRightNode()) : node.getRightNode() == null;
     }
 }

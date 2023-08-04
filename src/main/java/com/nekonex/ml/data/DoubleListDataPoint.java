@@ -1,13 +1,21 @@
 package com.nekonex.ml.data;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.nekonex.ml.cluster.kmeans.OnlineKmeanConfig;
 import com.nekonex.ml.exceptions.DataPointsIncompatibleException;
 
 import java.util.List;
 
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class DoubleListDataPoint  implements IDataPoint {
     List<Double> _data;
 
-    public DoubleListDataPoint(List<Double> data) {
+
+    @JsonCreator
+    public DoubleListDataPoint(@JsonProperty("data") List<Double> data) {
         this._data = data;
     }
     @Override
@@ -28,6 +36,7 @@ public class DoubleListDataPoint  implements IDataPoint {
         return _data.get(axisNum);
     }
 
+    @JsonIgnore
     @Override
     public int getNumAxis() {
         return _data.size();
@@ -36,5 +45,31 @@ public class DoubleListDataPoint  implements IDataPoint {
     @Override
     public IDataPoint clone() {
         return new DoubleListDataPoint(_data.stream().toList());
+    }
+
+
+    @JsonProperty("data")
+    public List<Double> getData() {
+        return _data;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+
+        if (!(obj instanceof DoubleListDataPoint)) {
+            return false;
+        }
+
+        DoubleListDataPoint lstDataPt = (DoubleListDataPoint) obj;
+        if (lstDataPt.getData().size() != _data.size() )
+            return false;
+        for (int i = 0; i< _data.size(); ++i) {
+            if (Math.abs(_data.get(i) - lstDataPt.getData().get(i)) > 0.0001)
+                return false;
+        }
+        return true;
     }
 }

@@ -1,7 +1,6 @@
 package com.nekonex.ml.cluster.kdtree;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.nekonex.ml.cluster.IClusterNode;
@@ -16,16 +15,24 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nekonex.ml.exceptions.InvalidNodesException;
 
 
-
-@JsonDeserialize(using = KdTreeDeserializer.class)
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class KdTree {
     private static final Random random = new Random(0);
 
-    public final int dimensionCount;
+    private final int dimensionCount;
 
-    public final KdNode rootNode;
+    private final KdNode rootNode;
 
     private DistanceComputer.DistanceType _distType;
+
+    @JsonCreator
+    public KdTree(@JsonProperty("dimensionCount") int dimensionCount,
+                  @JsonProperty("rootNode") KdNode rootNode,
+                  @JsonProperty("distType") DistanceComputer.DistanceType distType) {
+        this.dimensionCount = dimensionCount;
+        this.rootNode = rootNode;
+        this._distType = distType;
+    }
 
     public KdTree(List<? extends IClusterNode> nodes, DistanceComputer.DistanceType distType) {
         _distType = distType;
@@ -164,4 +171,34 @@ public class KdTree {
         return mapper.readValue(jsonString, KdTree.class);
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+
+        if (!(obj instanceof KdTree)) {
+            return false;
+        }
+
+        KdTree tree = (KdTree) obj;
+        return this.dimensionCount == tree.getDimensionCount() &&
+                this.getRootNode().equals(tree.getRootNode()) &&
+                this.getDistType() == tree.getDistType();
+    }
+
+    @JsonProperty("dimensionCount")
+    public int getDimensionCount() {
+        return dimensionCount;
+    }
+
+    @JsonProperty("rootNode")
+    public KdNode getRootNode() {
+        return rootNode;
+    }
+
+    @JsonProperty("distType")
+    public DistanceComputer.DistanceType getDistType() {
+        return _distType;
+    }
 }

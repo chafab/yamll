@@ -1,5 +1,8 @@
 package com.nekonex.ml.cluster.kmeans;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.nekonex.ml.cluster.IClusterAlgorithm;
 import com.nekonex.ml.cluster.kdtree.KdTree;
 import com.nekonex.ml.data.DistanceComputer;
@@ -9,11 +12,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class OnlineKMeans implements IClusterAlgorithm {
-    OnlineKmeanConfig _config;
-    List<OnlineKMeanNode> list = new ArrayList<>();
+    private final OnlineKmeanConfig _config;
+    private List<OnlineKMeanNode> list = new ArrayList<>();
     public OnlineKMeans(OnlineKmeanConfig config) {
         _config = config;
+    }
+
+
+    @JsonCreator
+    public OnlineKMeans(@JsonProperty("config") OnlineKmeanConfig config, @JsonProperty("nodelist") List<OnlineKMeanNode> list) {
+        this._config = config;
+        this.list = list;
     }
     @Override
     public KdTree buildCluster(List<IDataPoint> dataPoints) throws Exception {
@@ -48,5 +59,13 @@ public class OnlineKMeans implements IClusterAlgorithm {
         return new KdTree(list.stream().map(OnlineKMeanNode::clone).toList(), _config.getDistanceType());
     }
 
+    @JsonProperty("config")
+    public OnlineKmeanConfig getConfig() {
+        return _config;
+    }
 
+    @JsonProperty("nodelist")
+    public List<OnlineKMeanNode> getListNode() {
+        return list;
+    }
 }

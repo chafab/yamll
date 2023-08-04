@@ -1,15 +1,33 @@
 package com.nekonex.ml.cluster.kmeans;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.nekonex.ml.cluster.IClusterNode;
+import com.nekonex.ml.cluster.kdtree.KdNode;
 import com.nekonex.ml.data.IDataPoint;
 import com.nekonex.ml.exceptions.DataPointsIncompatibleException;
 
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class OnlineKMeanNode implements IClusterNode{
     private IDataPoint _coordinates = null;
     OnlineKmeanConfig _config;
 
     private double _coefficient = 0.1;
     private long _count = 0;
+
+
+    @JsonCreator
+    public OnlineKMeanNode(@JsonProperty("config") OnlineKmeanConfig config,
+                           @JsonProperty("coordinates") IDataPoint coordinates,
+                           @JsonProperty("coefficient") double coefficient,
+                           @JsonProperty("count") long count) {
+        _config = config;
+        _coordinates = coordinates;
+        _coefficient = coefficient;
+        _count = count;
+    }
     public OnlineKMeanNode(OnlineKmeanConfig config) {
         _config = config;
         _coefficient = _config.getInitialCoefficient();
@@ -30,11 +48,13 @@ public class OnlineKMeanNode implements IClusterNode{
 
     }
 
+    @JsonProperty("count")
     @Override
     public synchronized long count() {
         return _count;
     }
 
+    @JsonIgnore
     @Override
     public IDataPoint getPoint() {
         return _coordinates;
@@ -53,6 +73,7 @@ public class OnlineKMeanNode implements IClusterNode{
         _coordinates = value;
     }
 
+    @JsonProperty("coefficient")
     public synchronized double getCoefficient() {
         return _coefficient;
     }
@@ -62,4 +83,31 @@ public class OnlineKMeanNode implements IClusterNode{
     }
 
     public synchronized  void setCount(long value) { _count = value;}
+
+    @JsonProperty("coordinates")
+    public IDataPoint getCoordinates() {
+        return _coordinates;
+    }
+
+    @JsonProperty("config")
+    public OnlineKmeanConfig getConfig() {
+        return _config;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+
+        if (!(obj instanceof OnlineKMeanNode)) {
+            return false;
+        }
+
+        OnlineKMeanNode node = (OnlineKMeanNode) obj;
+        return this._coordinates.equals(node.getCoordinates()) &&
+                this._config.equals(node.getConfig()) &&
+                this._coefficient == node.getCoefficient() &&
+                this._count == node.count();
+    }
 }

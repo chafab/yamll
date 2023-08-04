@@ -16,6 +16,8 @@ public class KdTreeDeserializer extends JsonDeserializer<KdTree> {
         int dimensionCount = node.get("dimensionCount").asInt();
 
         JsonNode rootNodeJson = node.get("rootNode");
+        JsonNode leftNode = node.get("leftNode");
+        JsonNode rightNode = node.get("rightNode");
         /*KdNode rootNode = new KdNode();
         // Assuming KdNode has a setter method for id
         rootNode.setId(rootNodeJson.get("@id").asText());
