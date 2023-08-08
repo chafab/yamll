@@ -8,21 +8,21 @@ import com.nekonex.ml.cluster.kdtree.KdTree;
 import com.nekonex.ml.data.DistanceComputer;
 import com.nekonex.ml.data.IDataPoint;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class OnlineKMeans implements IClusterAlgorithm {
-    private final OnlineKmeanConfig _config;
-    private List<OnlineKMeanNode> list = new ArrayList<>();
-    public OnlineKMeans(OnlineKmeanConfig config) {
+    private final KmeansConfig _config;
+    private List<OnlineKMeansNode> list = new ArrayList<>();
+    public OnlineKMeans(KmeansConfig config) {
+        if (config == null)
+            throw new NullPointerException();
         _config = config;
     }
 
 
     @JsonCreator
-    public OnlineKMeans(@JsonProperty("config") OnlineKmeanConfig config, @JsonProperty("nodelist") List<OnlineKMeanNode> list) {
+    public OnlineKMeans(@JsonProperty("config") KmeansConfig config, @JsonProperty("nodelist") List<OnlineKMeansNode> list) {
         this._config = config;
         this.list = list;
     }
@@ -30,8 +30,8 @@ public class OnlineKMeans implements IClusterAlgorithm {
     public KdTree buildCluster(List<IDataPoint> dataPoints) throws Exception {
         Random rand = new Random(0);
         while (dataPoints.size() > 0) {
-            if (_config.getNumCluster() < list.size()) {
-                OnlineKMeanNode node = new OnlineKMeanNode(_config);
+            if (list.size() < _config.getNumCluster()) {
+                OnlineKMeansNode node = new OnlineKMeansNode(_config);
                 list.add(node);
 
 
@@ -42,9 +42,9 @@ public class OnlineKMeans implements IClusterAlgorithm {
             else {
                 //Poor performance algo but ok at build time for our use case
                 int rndDataPnt = rand.nextInt(dataPoints.size());
-                OnlineKMeanNode nearestNode = null;
+                OnlineKMeansNode nearestNode = null;
                 double min_distance = Double.MAX_VALUE;
-                for (OnlineKMeanNode node : list) {
+                for (OnlineKMeansNode node : list) {
                     double distance =
                             DistanceComputer.computeDistance(node.getPoint(), dataPoints.get(rndDataPnt), _config.getDistanceType());
                     if (nearestNode == null || distance < min_distance) {
@@ -56,16 +56,16 @@ public class OnlineKMeans implements IClusterAlgorithm {
                 dataPoints.remove(rndDataPnt);
             }
         }
-        return new KdTree(list.stream().map(OnlineKMeanNode::clone).toList(), _config.getDistanceType());
+        return new KdTree(list.stream().map(OnlineKMeansNode::clone).toList(), _config.getDistanceType());
     }
 
     @JsonProperty("config")
-    public OnlineKmeanConfig getConfig() {
+    public KmeansConfig getConfig() {
         return _config;
     }
 
     @JsonProperty("nodelist")
-    public List<OnlineKMeanNode> getListNode() {
+    public List<OnlineKMeansNode> getListNode() {
         return list;
     }
 }

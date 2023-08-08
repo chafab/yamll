@@ -39,6 +39,7 @@ public class KdTree {
         if (nodes == null || nodes.isEmpty() || nodes.get(0).getPoint() == null) {
             throw new InvalidNodesException();
         }
+        nodes = new ArrayList<>(nodes);//Make it mutable
 
         this.dimensionCount = nodes.get(0).getPoint().getNumAxis();
         if (this.dimensionCount <= 0)

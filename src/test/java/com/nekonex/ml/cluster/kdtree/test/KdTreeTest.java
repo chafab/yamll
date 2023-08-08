@@ -3,8 +3,8 @@ package com.nekonex.ml.cluster.kdtree.test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.nekonex.ml.cluster.IClusterNode;
 import com.nekonex.ml.cluster.kdtree.KdTree;
-import com.nekonex.ml.cluster.kmeans.OnlineKMeanNode;
-import com.nekonex.ml.cluster.kmeans.OnlineKmeanConfig;
+import com.nekonex.ml.cluster.kmeans.OnlineKMeansNode;
+import com.nekonex.ml.cluster.kmeans.KmeansConfig;
 import com.nekonex.ml.data.DistanceComputer;
 import com.nekonex.ml.data.DoubleListDataPoint;
 import com.nekonex.ml.data.IDataPoint;
@@ -24,8 +24,8 @@ public class KdTreeTest {
     void testInit() throws Exception {
         assertThrows(InvalidNodesException.class, ()-> { new KdTree(null, DistanceComputer.DistanceType.Euclidean);});
         assertThrows(InvalidNodesException.class, ()-> { new KdTree(new ArrayList<>(), DistanceComputer.DistanceType.Euclidean);});
-        OnlineKmeanConfig config = new OnlineKmeanConfig();
-        OnlineKMeanNode node = new OnlineKMeanNode(config);
+        KmeansConfig config = new KmeansConfig();
+        OnlineKMeansNode node = new OnlineKMeansNode(config);
         List<IClusterNode> list = new ArrayList<>();
         list.add(node);
         //Node does not countain any point
@@ -46,15 +46,15 @@ public class KdTreeTest {
 
     @Test
     void testValidNodes() {
-        OnlineKmeanConfig config = new OnlineKmeanConfig();
+        KmeansConfig config = new KmeansConfig();
         List<IClusterNode> clusterList = new ArrayList<>();
-        OnlineKMeanNode node1 = new OnlineKMeanNode(config);
+        OnlineKMeansNode node1 = new OnlineKMeansNode(config);
         DoubleListDataPoint ld1 = new DoubleListDataPoint(List.of(0.0));
         node1.addDataPoint(ld1);
-        OnlineKMeanNode node2 = new OnlineKMeanNode(config);
+        OnlineKMeansNode node2 = new OnlineKMeansNode(config);
         DoubleListDataPoint ld2 = new DoubleListDataPoint(List.of(1.0));
         node2.addDataPoint(ld2);
-        OnlineKMeanNode node3 = new OnlineKMeanNode(config);
+        OnlineKMeansNode node3 = new OnlineKMeansNode(config);
         DoubleListDataPoint ld3 = new DoubleListDataPoint(List.of(2.0));
         node3.addDataPoint(ld3);
         clusterList.add(node1);
@@ -69,8 +69,8 @@ public class KdTreeTest {
     }
 
     void addClusterNode2D(List<IClusterNode> clusterList, double x, double y) {
-        OnlineKmeanConfig config = new OnlineKmeanConfig();
-        OnlineKMeanNode node = new OnlineKMeanNode(config);
+        KmeansConfig config = new KmeansConfig();
+        OnlineKMeansNode node = new OnlineKMeansNode(config);
         DoubleListDataPoint ld = new DoubleListDataPoint(List.of(x,y));
         node.addDataPoint(ld);
         clusterList.add(node);
@@ -118,7 +118,7 @@ public class KdTreeTest {
         DoubleListDataPoint ld = new DoubleListDataPoint(List.of(1.1,1.0));
         KdTree tree = new KdTree(clusterList, DistanceComputer.DistanceType.Euclidean);
         String json = tree.saveAsJson();
-        String correctJson = "{\"@class\":\"com.nekonex.ml.cluster.kdtree.KdTree\",\"dimensionCount\":2,\"rootNode\":{\"@class\":\"com.nekonex.ml.cluster.kdtree.KdNode\",\"@id\":\"b5b87a3f-e360-49f7-84b6-b0017088f4a5\",\"clusterNode\":{\"@class\":\"com.nekonex.ml.cluster.kmeans.OnlineKMeanNode\",\"config\":{\"coefficientDecay\":0.99,\"minCoefficient\":1.0E-4,\"initialCoefficient\":0.01,\"numCluster\":0,\"distanceType\":\"Euclidean\"},\"coordinates\":{\"@class\":\"com.nekonex.ml.data.DoubleListDataPoint\",\"data\":[0.5,0.5]},\"coefficient\":0.01,\"count\":1},\"depth\":0,\"axisIndex\":0,\"leftNode\":{\"@class\":\"com.nekonex.ml.cluster.kdtree.KdNode\",\"@id\":\"874fd841-54b9-4697-88e8-756674f7a4e9\",\"clusterNode\":{\"@class\":\"com.nekonex.ml.cluster.kmeans.OnlineKMeanNode\",\"config\":{\"coefficientDecay\":0.99,\"minCoefficient\":1.0E-4,\"initialCoefficient\":0.01,\"numCluster\":0,\"distanceType\":\"Euclidean\"},\"coordinates\":{\"@class\":\"com.nekonex.ml.data.DoubleListDataPoint\",\"data\":[0.0,1.0]},\"coefficient\":0.01,\"count\":1},\"depth\":1,\"axisIndex\":1,\"leftNode\":{\"@class\":\"com.nekonex.ml.cluster.kdtree.KdNode\",\"@id\":\"93b9e565-6080-4a8b-a6f8-8ef2e5757fe4\",\"clusterNode\":{\"@class\":\"com.nekonex.ml.cluster.kmeans.OnlineKMeanNode\",\"config\":{\"coefficientDecay\":0.99,\"minCoefficient\":1.0E-4,\"initialCoefficient\":0.01,\"numCluster\":0,\"distanceType\":\"Euclidean\"},\"coordinates\":{\"@class\":\"com.nekonex.ml.data.DoubleListDataPoint\",\"data\":[0.0,0.0]},\"coefficient\":0.01,\"count\":1},\"depth\":2,\"axisIndex\":0,\"leftNode\":null,\"rightNode\":null},\"rightNode\":null},\"rightNode\":{\"@class\":\"com.nekonex.ml.cluster.kdtree.KdNode\",\"@id\":\"520bf549-f675-46de-967d-b5d8a12d26b9\",\"clusterNode\":{\"@class\":\"com.nekonex.ml.cluster.kmeans.OnlineKMeanNode\",\"config\":{\"coefficientDecay\":0.99,\"minCoefficient\":1.0E-4,\"initialCoefficient\":0.01,\"numCluster\":0,\"distanceType\":\"Euclidean\"},\"coordinates\":{\"@class\":\"com.nekonex.ml.data.DoubleListDataPoint\",\"data\":[1.0,1.0]},\"coefficient\":0.01,\"count\":1},\"depth\":1,\"axisIndex\":1,\"leftNode\":{\"@class\":\"com.nekonex.ml.cluster.kdtree.KdNode\",\"@id\":\"5c2936ab-6e30-4ef5-8b34-59a015703972\",\"clusterNode\":{\"@class\":\"com.nekonex.ml.cluster.kmeans.OnlineKMeanNode\",\"config\":{\"coefficientDecay\":0.99,\"minCoefficient\":1.0E-4,\"initialCoefficient\":0.01,\"numCluster\":0,\"distanceType\":\"Euclidean\"},\"coordinates\":{\"@class\":\"com.nekonex.ml.data.DoubleListDataPoint\",\"data\":[1.0,0.0]},\"coefficient\":0.01,\"count\":1},\"depth\":2,\"axisIndex\":0,\"leftNode\":null,\"rightNode\":null},\"rightNode\":null}},\"distType\":\"Euclidean\"}";
+        String correctJson = "{\"@class\":\"com.nekonex.ml.cluster.kdtree.KdTree\",\"dimensionCount\":2,\"rootNode\":{\"@class\":\"com.nekonex.ml.cluster.kdtree.KdNode\",\"@id\":\"198905c4-41f9-46b4-a27e-cecd789e3d8c\",\"clusterNode\":{\"@class\":\"com.nekonex.ml.cluster.kmeans.OnlineKMeansNode\",\"config\":{\"coefficientDecay\":0.99,\"minCoefficient\":1.0E-4,\"initialCoefficient\":0.01,\"numCluster\":1,\"minIter\":10,\"distanceType\":\"Euclidean\"},\"coordinates\":{\"@class\":\"com.nekonex.ml.data.DoubleListDataPoint\",\"data\":[0.5,0.5]},\"coefficient\":0.01,\"count\":1},\"depth\":0,\"axisIndex\":0,\"leftNode\":{\"@class\":\"com.nekonex.ml.cluster.kdtree.KdNode\",\"@id\":\"91c0379b-a9d0-4abc-9169-95a44e525288\",\"clusterNode\":{\"@class\":\"com.nekonex.ml.cluster.kmeans.OnlineKMeansNode\",\"config\":{\"coefficientDecay\":0.99,\"minCoefficient\":1.0E-4,\"initialCoefficient\":0.01,\"numCluster\":1,\"minIter\":10,\"distanceType\":\"Euclidean\"},\"coordinates\":{\"@class\":\"com.nekonex.ml.data.DoubleListDataPoint\",\"data\":[0.0,1.0]},\"coefficient\":0.01,\"count\":1},\"depth\":1,\"axisIndex\":1,\"leftNode\":{\"@class\":\"com.nekonex.ml.cluster.kdtree.KdNode\",\"@id\":\"8711f2ed-aa06-4db8-b94d-5b610844ea1a\",\"clusterNode\":{\"@class\":\"com.nekonex.ml.cluster.kmeans.OnlineKMeansNode\",\"config\":{\"coefficientDecay\":0.99,\"minCoefficient\":1.0E-4,\"initialCoefficient\":0.01,\"numCluster\":1,\"minIter\":10,\"distanceType\":\"Euclidean\"},\"coordinates\":{\"@class\":\"com.nekonex.ml.data.DoubleListDataPoint\",\"data\":[0.0,0.0]},\"coefficient\":0.01,\"count\":1},\"depth\":2,\"axisIndex\":0,\"leftNode\":null,\"rightNode\":null},\"rightNode\":null},\"rightNode\":{\"@class\":\"com.nekonex.ml.cluster.kdtree.KdNode\",\"@id\":\"4d05d3e6-6679-4fde-bf3c-e8e8a8df289e\",\"clusterNode\":{\"@class\":\"com.nekonex.ml.cluster.kmeans.OnlineKMeansNode\",\"config\":{\"coefficientDecay\":0.99,\"minCoefficient\":1.0E-4,\"initialCoefficient\":0.01,\"numCluster\":1,\"minIter\":10,\"distanceType\":\"Euclidean\"},\"coordinates\":{\"@class\":\"com.nekonex.ml.data.DoubleListDataPoint\",\"data\":[1.0,1.0]},\"coefficient\":0.01,\"count\":1},\"depth\":1,\"axisIndex\":1,\"leftNode\":{\"@class\":\"com.nekonex.ml.cluster.kdtree.KdNode\",\"@id\":\"3f98f9b7-755a-449e-a7aa-b07c4ea16d15\",\"clusterNode\":{\"@class\":\"com.nekonex.ml.cluster.kmeans.OnlineKMeansNode\",\"config\":{\"coefficientDecay\":0.99,\"minCoefficient\":1.0E-4,\"initialCoefficient\":0.01,\"numCluster\":1,\"minIter\":10,\"distanceType\":\"Euclidean\"},\"coordinates\":{\"@class\":\"com.nekonex.ml.data.DoubleListDataPoint\",\"data\":[1.0,0.0]},\"coefficient\":0.01,\"count\":1},\"depth\":2,\"axisIndex\":0,\"leftNode\":null,\"rightNode\":null},\"rightNode\":null}},\"distType\":\"Euclidean\"}";
         JsonNode node1 = JsonKdTreeTestHelper.parseAndRemoveIds(correctJson);
         JsonNode node2 = JsonKdTreeTestHelper.parseAndRemoveIds(json);
         assertEquals(node1, node2);

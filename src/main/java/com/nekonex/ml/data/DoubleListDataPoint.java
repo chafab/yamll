@@ -4,19 +4,19 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.nekonex.ml.cluster.kmeans.OnlineKmeanConfig;
 import com.nekonex.ml.exceptions.DataPointsIncompatibleException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class DoubleListDataPoint  implements IDataPoint {
-    List<Double> _data;
+    private List<Double> _data;
 
 
     @JsonCreator
     public DoubleListDataPoint(@JsonProperty("data") List<Double> data) {
-        this._data = data;
+        this._data = new ArrayList<>(data); //Must be mutable
     }
     @Override
     public void moveTo(IDataPoint target_point, double coeff) {
@@ -28,6 +28,26 @@ public class DoubleListDataPoint  implements IDataPoint {
         DoubleListDataPoint tgt = (DoubleListDataPoint) target_point;
         for (int i = 0; i < this.getNumAxis(); ++i) {
             _data.set(i, _data.get(i)*(1-coeff) + coeff*(Double)tgt.getCoordinate(i));
+        }
+    }
+
+    @Override
+    public void center(List<IDataPoint> listPoints) {
+        List<Double> val = new ArrayList<>();
+        for (int i = 0; i < listPoints.size(); ++i) {
+            DoubleListDataPoint point = (DoubleListDataPoint) listPoints.get(i);
+            if (val.size() == 0) {
+                for (int j =0; j< point.getData().size(); ++j)
+                    val.add(point.getData().get(j));
+            }
+            else {
+                for (int j =0; j< point.getData().size(); ++j)
+                    val.set(j, val.get(j)+point.getData().get(j));
+            }
+        }
+        if (listPoints.size() > 1) {
+            for (int j =0; j< val.size(); ++j)
+                _data.set(j, val.get(j)/((double) listPoints.size()));
         }
     }
 
@@ -44,7 +64,7 @@ public class DoubleListDataPoint  implements IDataPoint {
 
     @Override
     public IDataPoint clone() {
-        return new DoubleListDataPoint(_data.stream().toList());
+        return new DoubleListDataPoint(new ArrayList<>(_data.stream().toList()));
     }
 
 
